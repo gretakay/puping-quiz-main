@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>普平精舍 各級禪修學習系統</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#E8640A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="禪修學習" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange:       #E8640A;
+      --orange-light: #FFA040;
+      --orange-pale:  #FFF3E8;
+      --bg:           #FDF6EE;
+      --card:         #FFFFFF;
+      --text:         #2D1A00;
+      --text-sub:     #7A5C3A;
+      --correct:      #2E8B57;
+      --correct-bg:   #EAF7EE;
+      --wrong:        #C0392B;
+      --wrong-bg:     #FDEDED;
+      --neutral-bg:   #F5F0EA;
+      --neutral-text: #9A8070;
+      --radius:       16px;
+      --shadow:       0 4px 20px rgba(232,100,10,0.10);
+    }
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+    }
+    header {
+      background: var(--orange); color: #fff;
+      text-align: center; padding: 20px 16px 16px;
+    }
+    header h1 { font-size: 24px; font-weight: 700; letter-spacing: 2px; }
+    header p  { font-size: 14px; margin-top: 4px; opacity: 0.85; }
+
+    .screen { display: none; padding: 24px 16px 40px; max-width: 480px; margin: 0 auto; }
+    .screen.active { display: block; }
+
+    /* ── 返回連結 ── */
+    .back-link {
+      display: inline-block; background: none; border: none;
+      color: var(--text-sub); font-size: 15px; cursor: pointer;
+      padding: 4px 0 12px; margin-bottom: 4px;
+    }
+    .back-link:hover { color: var(--orange); }
+
+    /* ── 班級 / 課程 / 題型選擇 ── */
+    .section-title {
+      font-size: 20px; font-weight: 700;
+      text-align: center; margin: 8px 0 20px; color: var(--orange);
+    }
+    .class-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .class-btn {
+      background: var(--card); border: 2.5px solid var(--orange-light);
+      border-radius: var(--radius); padding: 22px 12px;
+      font-size: 20px; font-weight: 700; color: var(--orange);
+      cursor: pointer; text-align: center; box-shadow: var(--shadow);
+      transition: background .15s, color .15s, transform .1s;
+    }
+    .class-btn:hover, .class-btn:active {
+      background: var(--orange); color: #fff; transform: scale(1.03);
+    }
+    .class-btn span {
+      display: block; font-size: 13px; font-weight: 400; opacity: .7; margin-top: 4px;
+    }
+
+    /* 題型選擇用單欄大按鈕 */
+    .type-grid { display: flex; flex-direction: column; gap: 14px; }
+    .type-btn {
+      background: var(--card); border: 2.5px solid var(--orange-light);
+      border-radius: var(--radius); padding: 20px 24px;
+      font-size: 20px; font-weight: 700; color: var(--orange);
+      cursor: pointer; text-align: center; box-shadow: var(--shadow);
+      transition: background .15s, color .15s, transform .1s;
+    }
+    .type-btn:hover, .type-btn:active {
+      background: var(--orange); color: #fff; transform: scale(1.03);
+    }
+    .type-btn span {
+      display: block; font-size: 14px; font-weight: 400; opacity: .7; margin-top: 4px;
+    }
+
+    /* 目前選擇的麵包屑提示 */
+    .breadcrumb {
+      font-size: 13px; color: var(--text-sub); text-align: center;
+      margin-bottom: 16px; background: var(--orange-pale);
+      border-radius: 99px; padding: 5px 16px; display: inline-block;
+      width: 100%;
+    }
+    .breadcrumb strong { color: var(--orange); }
+
+    /* ── 載入中 ── */
+    .loading-wrap {
+      text-align: center; padding: 60px 20px;
+    }
+    .spinner {
+      width: 48px; height: 48px; border: 5px solid var(--orange-pale);
+      border-top-color: var(--orange); border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 17px; color: var(--text-sub); }
+
+    /* ── 錯誤 ── */
+    .error-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 32px 24px; text-align: center; box-shadow: var(--shadow); margin-top: 20px;
+    }
+    .error-icon { font-size: 48px; margin-bottom: 12px; }
+    .error-card p { font-size: 17px; color: var(--text-sub); line-height: 1.7; }
+    .back-btn {
+      margin-top: 24px; background: var(--orange); color: #fff; border: none;
+      border-radius: 12px; padding: 14px 32px; font-size: 17px; font-weight: 700; cursor: pointer;
+    }
+
+    /* ── 答題 ── */
+    .progress-bar-wrap { background: #F2D9C0; border-radius: 99px; height: 8px; margin-bottom: 8px; }
+    .progress-bar { background: var(--orange); height: 8px; border-radius: 99px; transition: width .3s; }
+    .progress-label { font-size: 13px; color: var(--text-sub); text-align: right; margin-bottom: 16px; }
+
+    .question-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 24px 20px; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .question-type {
+      font-size: 12px; font-weight: 700; background: var(--orange-pale); color: var(--orange);
+      border-radius: 99px; display: inline-block; padding: 3px 12px; margin-bottom: 12px;
+    }
+    .question-text { font-size: 20px; line-height: 1.8; font-weight: 600; white-space: pre-line; }
+    .blank {
+      display: inline-block; border-bottom: 3px solid var(--orange);
+      min-width: 2em; text-align: center; color: var(--orange);
+      font-weight: 700; padding: 0 4px;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn {
+      background: var(--card); border: 2px solid #E0C8A8; border-radius: 12px;
+      padding: 14px 16px; font-size: 17px; font-weight: 500; color: var(--text);
+      cursor: pointer; text-align: left; transition: background .15s, border-color .15s; width: 100%;
+      position: relative;
+    }
+    .opt-good-stk {
+      position: absolute; top: -22px; right: 6px;
+      width: 52px; height: 52px; object-fit: contain; pointer-events: none;
+    }
+    .option-btn:not(.disabled):hover { border-color: var(--orange); background: var(--orange-pale); }
+    .option-btn.correct  { background: var(--correct-bg); border-color: var(--correct); border-width: 3px; }
+    .option-btn.wrong    { background: var(--wrong-bg);   border-color: var(--wrong);   border-width: 3px; }
+    .option-btn.neutral  { background: var(--neutral-bg); border-color: #D5C8B8; }
+    .option-btn.disabled { cursor: default; }
+    .opt-main { display: flex; align-items: flex-start; gap: 8px; }
+    .opt-label-tag { font-size: 16px; font-weight: 700; flex-shrink: 0; min-width: 28px; }
+    .opt-text { font-size: 17px; line-height: 1.5; }
+    .opt-exp {
+      display: none; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      font-size: 14px; line-height: 1.7; font-weight: 400;
+    }
+    .option-btn.correct .opt-exp { display: block; color: var(--correct); }
+    .option-btn.wrong   .opt-exp { display: block; color: var(--wrong); }
+    .option-btn.neutral .opt-exp { display: block; color: var(--neutral-text); }
+    .correct-badge, .wrong-badge {
+      display: none; float: right;
+      font-size: 12px; font-weight: 700; border-radius: 99px; padding: 2px 10px; margin-left: 8px; color: #fff;
+    }
+    .correct-badge { background: var(--correct); }
+    .wrong-badge   { background: var(--wrong); }
+    .option-btn.correct.user-selected .correct-badge { display: inline-block; }
+    .option-btn.wrong.user-selected   .wrong-badge   { display: inline-block; }
+
+    #options-hint { font-size: 15px; color: var(--text-sub); margin-bottom: 10px; display: none; }
+
+    .next-btn {
+      display: none; width: 100%; background: var(--orange); color: #fff;
+      border: none; border-radius: 12px; padding: 18px;
+      font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 16px; letter-spacing: 1px;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { background: #C5540A; }
+
+    /* ── 完成 ── */
+    .finish-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 40px 24px; text-align: center; box-shadow: var(--shadow); margin-top: 20px;
+    }
+    .finish-card h2 { font-size: 26px; color: var(--orange); margin-bottom: 10px; }
+    .finish-card p  { font-size: 17px; color: var(--text-sub); line-height: 1.7; }
+    .score-box {
+      background: var(--orange-pale); border-radius: 14px;
+      padding: 20px 24px; margin: 20px 0;
+    }
+    .score-correct { font-size: 18px; color: var(--text-sub); margin-bottom: 10px; }
+    .score-correct strong { color: var(--text); font-size: 32px; font-weight: 700; }
+    .score-pct { font-size: 72px; font-weight: 700; color: var(--orange); line-height: 1; }
+    .score-pct span { font-size: 28px; font-weight: 600; }
+    .restart-btn {
+      margin-top: 28px; background: var(--orange); color: #fff; border: none;
+      border-radius: 12px; padding: 16px 36px; font-size: 18px; font-weight: 700; cursor: pointer;
+    }
+    .restart-btn:hover { background: #C5540A; }
+
+    /* ── 貼圖 ── */
+    .sticker-img { object-fit: contain; display: block; flex-shrink: 0; }
+
+    /* ── 滿分圖示 ── */
+    #perfect-icon-wrap {
+      display: none; position: fixed;
+      top: 32%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 9999; pointer-events: none;
+    }
+    #perfect-icon-wrap.show { display: block; }
+    #perfect-icon-wrap img {
+      width: 180px; height: 180px; object-fit: contain;
+      animation: perfectSpin 8s ease-out forwards;
+    }
+    @keyframes perfectSpin {
+      0%   { opacity: 0; transform: rotate(0deg) scale(0.2); }
+      5%   { opacity: 1; }
+      25%  { transform: rotate(1080deg) scale(1.05); opacity: 1; }
+      30%  { transform: rotate(1080deg) scale(1);    opacity: 1; }
+      87%  { transform: rotate(1080deg) scale(1);    opacity: 1; }
+      100% { transform: rotate(1080deg) scale(0.8);  opacity: 0; }
+    }
+
+    /* ── 煙火 canvas ── */
+    #fireworks-canvas {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      pointer-events: none; width: 100%; height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="資產 3_0.png" alt="普平精舍"
+    style="width:64px;height:64px;border-radius:50%;object-fit:cover;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.18);" />
+  <h1>普平精舍　各級禪修學習系統</h1>
+  <p>背經即是念法；專注即是禪定。</p>
+  <p style="font-size:12px;opacity:0.75;margin-top:2px;">惟覺安公老和尚</p>
+</header>
+
+<!-- 班級選擇 -->
+<div class="screen active" id="screen-home">
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0 20px;">
+    <img src="stk-hello.png" class="sticker-img" style="width:88px;height:88px;" alt="" />
+    <p style="font-size:20px;font-weight:700;color:var(--orange);">請選擇您的班級</p>
+    <img src="stk-cheer.png" class="sticker-img" style="width:88px;height:88px;" alt="" />
+  </div>
+  <div class="class-grid">
+    <button class="class-btn" onclick="selectClass('初級班')">初級班</button>
+    <button class="class-btn" onclick="selectClass('中級班')">中級班</button>
+    <button class="class-btn" onclick="selectClass('高一班')">高一班</button>
+    <button class="class-btn" onclick="selectClass('高二班')">高二班</button>
+    <button class="class-btn" onclick="selectClass('研一班')">研一班</button>
+    <button class="class-btn" onclick="selectClass('研二班')">研二班</button>
+    <button class="class-btn" onclick="selectClass('研三班')">研三班</button>
+    <button class="class-btn" onclick="selectClass('研四班')">研四班</button>
+  </div>
+</div>
+
+<!-- 課程選擇 -->
+<div class="screen" id="screen-course">
+  <button class="back-link" onclick="goHome()">← 重新選班級</button>
+  <div class="breadcrumb" id="course-breadcrumb"></div>
+  <p class="section-title">請選擇課程</p>
+  <div class="class-grid" id="course-grid"></div>
+</div>
+
+<!-- 題型選擇 -->
+<div class="screen" id="screen-type">
+  <button class="back-link" onclick="showScreen('screen-course')">← 重新選課程</button>
+  <div class="breadcrumb" id="type-breadcrumb"></div>
+  <p class="section-title">請選擇題型</p>
+  <div class="type-grid">
+    <button class="type-btn" onclick="startQuiz('choice')">
+      選擇題
+      <span>從選項中選出正確答案</span>
+    </button>
+    <button class="type-btn" onclick="startQuiz('fill')">
+      填充題
+      <span>從選項中選出填入空格的字詞</span>
+    </button>
+    <button class="type-btn" onclick="startQuiz('all')">
+      全部混合
+      <span>選擇題與填充題一起練習</span>
+    </button>
+  </div>
+</div>
+
+<!-- 載入中 -->
+<div class="screen" id="screen-loading">
+  <div class="loading-wrap">
+    <img src="stk-thinking.png" class="sticker-img" style="width:120px;height:120px;margin:0 auto 16px;" alt="" />
+    <div class="spinner"></div>
+    <p class="loading-text">載入題目中…</p>
+  </div>
+</div>
+
+<!-- 錯誤 -->
+<div class="screen" id="screen-error">
+  <div class="error-card">
+    <img src="stk-worry.png" class="sticker-img" style="width:120px;height:120px;margin:0 auto 12px;" alt="" />
+    <p id="error-msg">載入失敗，請稍後再試。</p>
+    <button class="back-btn" onclick="goHome()">返回</button>
+  </div>
+</div>
+
+<!-- 答題 -->
+<div class="screen" id="screen-quiz">
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="prog-bar" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="prog-label"></div>
+  <div class="question-card">
+    <div class="question-type" id="q-type"></div>
+    <div class="question-text" id="q-text"></div>
+  </div>
+  <div id="options-hint">請選擇填入空格的字詞：</div>
+  <div class="options" id="options-wrap"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一題 →</button>
+</div>
+
+<!-- 完成 -->
+<div class="screen" id="screen-finish">
+  <div class="finish-card">
+    <img src="stk-done.png" class="sticker-img" style="width:160px;height:160px;margin:0 auto 16px;" alt="" />
+    <h2>大功告成！</h2>
+    <div class="score-box">
+      <div class="score-correct">答對題數：<strong id="finish-correct">0 / 0</strong></div>
+      <div class="score-pct" id="finish-score">0<span> 分</span></div>
+    </div>
+    <img src="stk-ending.png" class="sticker-img" style="width:160px;height:160px;margin:16px auto 0;" alt="" />
+    <button class="restart-btn" onclick="showScreen('screen-course')">返回課程選擇</button>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycby4qYsswrwNsDDAzYR7wgN-EaSWNIPpRtChDDgvFDgW36W7faNdgDatFRMbb4tDdQAcvQ/exec';
+  const LABELS = ['Ａ', 'Ｂ', 'Ｃ', 'Ｄ'];
+  let questions = [];
+  let currentQ = 0;
+  let correctCount = 0;
+  let selectedClass = '';
+  let selectedCourse = '';
+  const courseCache = {};    // 班級 → 課程清單（避免重複呼叫 getCourses）
+  let prefetchPromise = null; // 選課程後在背景預載題目
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goHome() { showScreen('screen-home'); }
+
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = msg;
+    showScreen('screen-error');
+  }
+
+  // ── 步驟 1：選班級 → 抓課程清單（有快取則立即顯示）──
+  async function selectClass(className) {
+    selectedClass = className;
+    prefetchPromise = null; // 換班級時重置預載
+    if (courseCache[className]) {
+      renderCourseScreen(courseCache[className]);
+      return;
+    }
+    showScreen('screen-loading');
+    try {
+      const res = await fetch(`${API_URL}?action=getCourses&class=${encodeURIComponent(className)}`);
+      const data = await res.json();
+      if (data.success && data.courses && data.courses.length > 0) {
+        courseCache[className] = data.courses; // 存進快取
+        renderCourseScreen(data.courses);
+      } else {
+        showError('這個班級目前沒有課程題目，請聯繫管理員。');
+      }
+    } catch (e) {
+      showError('無法連接到題庫，請確認網路連線後再試。');
+    }
+  }
+
+  const ZH_NUM = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,
+                  '十':10,'十一':11,'十二':12,'十三':13,'十四':14,'十五':15,'十六':16};
+  function courseOrder(name) {
+    const m = name.match(/第([一二三四五六七八九十]+)課/);
+    return m ? (ZH_NUM[m[1]] ?? 999) : 999;
+  }
+
+  function renderCourseScreen(courses) {
+    document.getElementById('course-breadcrumb').innerHTML =
+      `班級：<strong>${selectedClass}</strong>`;
+
+    courses.sort((a, b) => courseOrder(a) - courseOrder(b));
+
+    const grid = document.getElementById('course-grid');
+    grid.innerHTML = '';
+    courses.forEach(course => {
+      const btn = document.createElement('button');
+      btn.className = 'class-btn';
+      btn.textContent = course;
+      btn.onclick = () => selectCourse(course);
+      grid.appendChild(btn);
+    });
+    showScreen('screen-course');
+  }
+
+  // ── 步驟 2：選課程 → 顯示題型選擇 + 背景預載題目 ──
+  function selectCourse(course) {
+    selectedCourse = course;
+    document.getElementById('type-breadcrumb').innerHTML =
+      `班級：<strong>${selectedClass}</strong>　課程：<strong>${selectedCourse}</strong>`;
+    showScreen('screen-type');
+    // 使用者思考題型的時間用來預載「全部」題目（順便暖 Apps Script 快取）
+    const params = new URLSearchParams({ action: 'getQuestions', class: selectedClass, course, type: 'all' });
+    prefetchPromise = fetch(`${API_URL}?${params}`).then(r => r.json()).catch(() => null);
+  }
+
+  // ── 步驟 3：選題型 → 抓題目 → 開始答題 ──
+  async function startQuiz(type) {
+    showScreen('screen-loading');
+    try {
+      let data = null;
+      // 若選「全部混合」且預載已完成，直接使用（零等待）
+      if (type === 'all' && prefetchPromise) {
+        data = await prefetchPromise;
+        prefetchPromise = null;
+      }
+      // 選擇題 / 填充題仍需打 API；但 Apps Script 快取已被預載暖好，速度快很多
+      if (!data || !data.success) {
+        const params = new URLSearchParams({ action: 'getQuestions', class: selectedClass, course: selectedCourse, type });
+        const res = await fetch(`${API_URL}?${params}`);
+        data = await res.json();
+      }
+      if (data.success && data.questions && data.questions.length > 0) {
+        questions = data.questions.map(apiToQuestion);
+        currentQ = 0;
+        correctCount = 0;
+        showScreen('screen-quiz');
+        renderQuestion();
+      } else {
+        showError('這個課程目前沒有符合的題目，請換一種題型或聯繫管理員。');
+      }
+    } catch (e) {
+      showError('無法連接到題庫，請確認網路連線後再試。');
+    }
+  }
+
+  // API 格式 → UI 格式
+  function apiToQuestion(q) {
+    const answerMap = { A: 0, B: 1, C: 2, D: 3 };
+    return {
+      type: q.type,
+      text: q.text,
+      options: [
+        { text: q.optA, exp: q.expA },
+        { text: q.optB, exp: q.expB },
+        { text: q.optC, exp: q.expC },
+        { text: q.optD, exp: q.expD },
+      ],
+      answer: answerMap[String(q.answer).toUpperCase()] ?? 0
+    };
+  }
+
+  function renderQuestionText(text) {
+    return String(text).replace(/\[空\]/g, '<span class="blank">　　</span>');
+  }
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    const total = questions.length;
+    const pct = Math.round((currentQ / total) * 100);
+
+    document.getElementById('prog-bar').style.width = pct + '%';
+    document.getElementById('prog-label').textContent = `第 ${currentQ + 1} 題 / 共 ${total} 題`;
+    document.getElementById('q-type').textContent = q.type === 'fill' ? '填充題' : '選擇題';
+    document.getElementById('q-text').innerHTML = renderQuestionText(q.text);
+    document.getElementById('next-btn').className = 'next-btn';
+
+    const hint = document.getElementById('options-hint');
+    hint.style.display = q.type === 'fill' ? 'block' : 'none';
+
+    const wrap = document.getElementById('options-wrap');
+    wrap.innerHTML = '';
+
+    if (q.type === 'fill') {
+      wrap.style.cssText = 'display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;';
+    } else {
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+    }
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      if (q.type === 'fill') {
+        btn.className = 'option-btn fill-option';
+        btn.style.cssText = 'width:calc(50% - 6px);text-align:center;padding:18px 8px;';
+        btn.innerHTML = `
+          <div class="opt-label-tag" style="font-size:13px;color:var(--text-sub);margin-bottom:6px;">${LABELS[i]}</div>
+          <div style="font-size:22px;font-weight:700;">${opt.text}</div>
+          <div class="opt-exp" style="font-size:13px;">${opt.exp}</div>`;
+      } else {
+        btn.className = 'option-btn';
+        btn.innerHTML = `
+          <div class="opt-main">
+            <span class="opt-label-tag">${LABELS[i]}</span>
+            <span class="opt-text">${opt.text}<span class="correct-badge">答對了！</span><span class="wrong-badge">答錯了！</span></span>
+          </div>
+          <div class="opt-exp">${opt.exp}</div>`;
+      }
+      btn.onclick = () => selectOption(i, q);
+      wrap.appendChild(btn);
+    });
+  }
+
+  function selectOption(idx, q) {
+    const isCorrect = idx === q.answer;
+    if (isCorrect) correctCount++;
+    document.querySelectorAll('.option-btn').forEach((btn, i) => {
+      btn.classList.add('disabled');
+      if (i === idx) btn.classList.add('user-selected');
+      if (i === q.answer) {
+        btn.classList.add('correct');
+        if (isCorrect) {
+          const stk = document.createElement('img');
+          stk.src = 'stk-good.png';
+          stk.className = 'opt-good-stk';
+          stk.alt = '';
+          btn.appendChild(stk);
+        }
+      } else if (i === idx) {
+        btn.classList.add('wrong');
+      } else {
+        btn.classList.add('neutral');
+      }
+    });
+    document.getElementById('next-btn').className = 'next-btn show';
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) showFinish();
+    else renderQuestion();
+  }
+
+  function showFinish() {
+    const total = questions.length;
+    const score = Math.round((correctCount / total) * 100);
+    document.getElementById('finish-correct').textContent = `${correctCount} / ${total}`;
+    document.getElementById('finish-score').innerHTML = `${score}<span> 分</span>`;
+    showScreen('screen-finish');
+    if (score === 100) { startFireworks(); showPerfectIcon(); }
+  }
+
+  function showPerfectIcon() {
+    const wrap = document.getElementById('perfect-icon-wrap');
+    const img  = wrap.querySelector('img');
+    // 重置動畫（若重複觸發）
+    img.style.animation = 'none';
+    wrap.classList.remove('show');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        img.style.animation = '';
+        wrap.classList.add('show');
+        setTimeout(() => wrap.classList.remove('show'), 8100);
+      });
+    });
+  }
+</script>
+<div id="perfect-icon-wrap">
+  <img src="perfect_icon.png" alt="" />
+</div>
+
+<canvas id="fireworks-canvas"></canvas>
+
+<script>
+(function () {
+  const canvas = document.getElementById('fireworks-canvas');
+  const ctx    = canvas.getContext('2d');
+  const COLORS = ['#E8640A','#FFA040','#FFD700','#FF6B35','#FF3E6C','#A0D468','#4FC1E9','#fff'];
+  let animId = null, particles = [], frameCount = 0;
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function burst(x, y) {
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const count = 60 + Math.floor(Math.random() * 20);
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 / count) * i;
+      const speed = 2 + Math.random() * 5;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1,
+        alpha: 1,
+        decay: 0.012 + Math.random() * 0.008,
+        r: 2 + Math.random() * 2.5,
+        color
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (frameCount % 45 === 0 && frameCount < 200) {
+      burst(canvas.width * (0.15 + Math.random() * 0.7),
+            canvas.height * (0.08 + Math.random() * 0.45));
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.vy   += 0.07;
+      p.x    += p.vx;
+      p.y    += p.vy;
+      p.alpha -= p.decay;
+      if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle   = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    frameCount++;
+    if (frameCount < 300 || particles.length > 0) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      canvas.style.display = 'none';
+    }
+  }
+
+  window.startFireworks = function () {
+    particles = []; frameCount = 0;
+    resize();
+    canvas.style.display = 'block';
+    if (animId) cancelAnimationFrame(animId);
+    burst(canvas.width * 0.3, canvas.height * 0.25);
+    burst(canvas.width * 0.7, canvas.height * 0.2);
+    animId = requestAnimationFrame(tick);
+  };
+})();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+</script>
+
+</body>
+</html>

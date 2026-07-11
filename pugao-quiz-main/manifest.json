@@ -1,0 +1,19 @@
+{
+  "name": "普平精舍 各級禪修學習系統",
+  "short_name": "禪修學習",
+  "description": "普平精舍各級禪修課程答題練習系統",
+  "start_url": "/pugao-quiz/",
+  "scope": "/pugao-quiz/",
+  "display": "standalone",
+  "background_color": "#FDF6EE",
+  "theme_color": "#E8640A",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
