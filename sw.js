@@ -1,18 +1,18 @@
-const CACHE_NAME = 'pugao-quiz-v3';
+const CACHE_NAME = 'puping-quiz-v1';
 const STATIC_FILES = [
-  '/pugao-quiz/',
-  '/pugao-quiz/index.html',
-  '/pugao-quiz/manifest.json',
-  '/pugao-quiz/%E8%B3%87%E7%94%A2%203_0.png',
-  '/pugao-quiz/stk-hello.png',
-  '/pugao-quiz/stk-cheer.png',
-  '/pugao-quiz/stk-thinking.png',
-  '/pugao-quiz/stk-worry.png',
-  '/pugao-quiz/stk-done.png',
-  '/pugao-quiz/stk-good.png',
-  '/pugao-quiz/stk-ending.png',
-  '/pugao-quiz/perfect_icon.png',
-  '/pugao-quiz/icon-192.png',
+  '/puping-quiz-main/',
+  '/puping-quiz-main/index.html',
+  '/puping-quiz-main/manifest.json',
+  '/puping-quiz-main/%E8%B3%87%E7%94%A2%203_0.png',
+  '/puping-quiz-main/stk-hello.png',
+  '/puping-quiz-main/stk-cheer.png',
+  '/puping-quiz-main/stk-thinking.png',
+  '/puping-quiz-main/stk-worry.png',
+  '/puping-quiz-main/stk-done.png',
+  '/puping-quiz-main/stk-good.png',
+  '/puping-quiz-main/stk-ending.png',
+  '/puping-quiz-main/perfect_icon.png',
+  '/puping-quiz-main/icon-192.png',
 ];
 
 // 安裝：預先快取所有靜態檔案
