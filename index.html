@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>普平精舍 各級禪修學習系統</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#E8640A" />
+  <meta name="theme-color" content="#7E7AD9" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -17,21 +17,21 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --orange:       #E8640A;
-      --orange-light: #FFA040;
-      --orange-pale:  #FFF3E8;
-      --bg:           #FDF6EE;
+      --orange:       #7E7AD9;
+      --orange-light: #AFADEB;
+      --orange-pale:  #EEF0FF;
+      --bg:           #F6F7FF;
       --card:         #FFFFFF;
-      --text:         #2D1A00;
-      --text-sub:     #7A5C3A;
+      --text:         #1D1B44;
+      --text-sub:     #5F5C8F;
       --correct:      #2E8B57;
       --correct-bg:   #EAF7EE;
       --wrong:        #C0392B;
       --wrong-bg:     #FDEDED;
-      --neutral-bg:   #F5F0EA;
-      --neutral-text: #9A8070;
+      --neutral-bg:   #F0EFF9;
+      --neutral-text: #8683B3;
       --radius:       16px;
-      --shadow:       0 4px 20px rgba(232,100,10,0.10);
+      --shadow:       0 4px 20px rgba(126,122,217,0.15);
     }
     body {
       font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
@@ -125,7 +125,7 @@
     }
 
     /* ── 答題 ── */
-    .progress-bar-wrap { background: #F2D9C0; border-radius: 99px; height: 8px; margin-bottom: 8px; }
+    .progress-bar-wrap { background: #DAD7F7; border-radius: 99px; height: 8px; margin-bottom: 8px; }
     .progress-bar { background: var(--orange); height: 8px; border-radius: 99px; transition: width .3s; }
     .progress-label { font-size: 13px; color: var(--text-sub); text-align: right; margin-bottom: 16px; }
 
@@ -146,7 +146,7 @@
 
     .options { display: flex; flex-direction: column; gap: 12px; }
     .option-btn {
-      background: var(--card); border: 2px solid #E0C8A8; border-radius: 12px;
+      background: var(--card); border: 2px solid #CCC9EF; border-radius: 12px;
       padding: 14px 16px; font-size: 17px; font-weight: 500; color: var(--text);
       cursor: pointer; text-align: left; transition: background .15s, border-color .15s; width: 100%;
       position: relative;
@@ -158,7 +158,7 @@
     .option-btn:not(.disabled):hover { border-color: var(--orange); background: var(--orange-pale); }
     .option-btn.correct  { background: var(--correct-bg); border-color: var(--correct); border-width: 3px; }
     .option-btn.wrong    { background: var(--wrong-bg);   border-color: var(--wrong);   border-width: 3px; }
-    .option-btn.neutral  { background: var(--neutral-bg); border-color: #D5C8B8; }
+    .option-btn.neutral  { background: var(--neutral-bg); border-color: #CFCBE8; }
     .option-btn.disabled { cursor: default; }
     .opt-main { display: flex; align-items: flex-start; gap: 8px; }
     .opt-label-tag { font-size: 16px; font-weight: 700; flex-shrink: 0; min-width: 28px; }
@@ -188,7 +188,7 @@
       font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 16px; letter-spacing: 1px;
     }
     .next-btn.show { display: block; }
-    .next-btn:hover { background: #C5540A; }
+    .next-btn:hover { background: #6661C8; }
 
     /* ── 完成 ── */
     .finish-card {
@@ -209,7 +209,7 @@
       margin-top: 28px; background: var(--orange); color: #fff; border: none;
       border-radius: 12px; padding: 16px 36px; font-size: 18px; font-weight: 700; cursor: pointer;
     }
-    .restart-btn:hover { background: #C5540A; }
+    .restart-btn:hover { background: #6661C8; }
 
     /* ── 貼圖 ── */
     .sticker-img { object-fit: contain; display: block; flex-shrink: 0; }
@@ -588,7 +588,7 @@
 (function () {
   const canvas = document.getElementById('fireworks-canvas');
   const ctx    = canvas.getContext('2d');
-  const COLORS = ['#E8640A','#FFA040','#FFD700','#FF6B35','#FF3E6C','#A0D468','#4FC1E9','#fff'];
+  const COLORS = ['#7E7AD9','#AFADEB','#C7C4F5','#6B67C9','#55A3E8','#7FD1F0','#9DE4C9','#fff'];
   let animId = null, particles = [], frameCount = 0;
 
   function resize() {

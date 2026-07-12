@@ -8,9 +8,9 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --orange: #E8640A; --orange-light: #FFA040; --orange-pale: #FFF3E8;
-      --bg: #FDF6EE; --card: #fff; --text: #2D1A00; --text-sub: #7A5C3A;
-      --radius: 12px; --shadow: 0 2px 12px rgba(232,100,10,0.10);
+      --orange: #7E7AD9; --orange-light: #AFADEB; --orange-pale: #EEF0FF;
+      --bg: #F6F7FF; --card: #fff; --text: #1D1B44; --text-sub: #5F5C8F;
+      --radius: 12px; --shadow: 0 2px 12px rgba(126,122,217,0.14);
       --red: #C0392B; --green: #2E8B57;
     }
     body { font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -31,7 +31,7 @@
     .login-card h2 { font-size: 22px; color: var(--orange); margin-bottom: 8px; }
     .login-card p { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
     .login-card input {
-      width: 100%; border: 2px solid #E0C8A8; border-radius: 8px;
+      width: 100%; border: 2px solid #CCC9EF; border-radius: 8px;
       padding: 12px 14px; font-size: 16px; margin-bottom: 12px;
     }
     .login-card input:focus { outline: none; border-color: var(--orange); }
@@ -60,7 +60,7 @@
     /* ── 共用元件 ── */
     label { display: block; font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 4px; margin-top: 14px; }
     input[type=text], textarea, select {
-      width: 100%; border: 2px solid #E0C8A8; border-radius: 8px;
+      width: 100%; border: 2px solid #CCC9EF; border-radius: 8px;
       padding: 10px 12px; font-size: 15px; font-family: inherit;
       background: #fff; color: var(--text);
     }
@@ -72,11 +72,11 @@
       padding: 10px 20px; font-size: 15px; font-weight: 700; cursor: pointer;
     }
     .btn-primary { background: var(--orange); color: #fff; }
-    .btn-primary:hover { background: #C5540A; }
+    .btn-primary:hover { background: #6661C8; }
     .btn-danger  { background: var(--red); color: #fff; }
     .btn-danger:hover  { background: #a02020; }
-    .btn-ghost   { background: #F0E8DC; color: var(--text); }
-    .btn-ghost:hover { background: #E0D0C0; }
+    .btn-ghost   { background: #ECEBFA; color: var(--text); }
+    .btn-ghost:hover { background: #DCD9F4; }
 
     .msg { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 12px; display: none; }
     .msg.ok  { background: #EAF7EE; color: var(--green); display: block; }
@@ -100,7 +100,7 @@
     .q-card.disabled-q { opacity: .5; }
     .q-toggle {
       width: 44px; height: 24px; border-radius: 99px; border: none; cursor: pointer;
-      background: #D0C0B0; position: relative; flex-shrink: 0; margin-top: 2px;
+      background: #BFBBDD; position: relative; flex-shrink: 0; margin-top: 2px;
       transition: background .2s;
     }
     .q-toggle.on { background: var(--green); }
