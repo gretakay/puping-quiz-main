@@ -1,4 +1,4 @@
-const CACHE_NAME = 'puping-quiz-v1';
+const CACHE_NAME = 'puping-quiz-v3';
 const STATIC_FILES = [
   '/puping-quiz-main/',
   '/puping-quiz-main/index.html',
