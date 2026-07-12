@@ -1,4 +1,4 @@
-const CACHE_NAME = 'puping-quiz-v3';
+const CACHE_NAME = 'puping-quiz-v4';
 const STATIC_FILES = [
   '/puping-quiz-main/',
   '/puping-quiz-main/index.html',
@@ -12,7 +12,7 @@ const STATIC_FILES = [
   '/puping-quiz-main/stk-good.png',
   '/puping-quiz-main/stk-ending.png',
   '/puping-quiz-main/perfect_icon.png',
-  '/puping-quiz-main/icon-192.png',
+  '/puping-quiz-main/icon-192.png?v=2',
 ];
 
 // 安裝：預先快取所有靜態檔案
